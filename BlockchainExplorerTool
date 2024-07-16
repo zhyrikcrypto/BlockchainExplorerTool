@@ -1,0 +1,46 @@
+// routes/index.js
+
+const express = require('express');
+const router = express.Router();
+const axios = require('axios');
+
+const API_URL = process.env.BLOCKCHAIN_API_URL;
+
+router.get('/', (req, res) => {
+    res.render('index');
+});
+
+router.get('/block/:hash', async (req, res) => {
+    const { hash } = req.params;
+    try {
+        const response = await axios.get(`${API_URL}/rawblock/${hash}`);
+        res.render('block', { block: response.data });
+    } catch (error) {
+        console.error(`Error fetching block ${hash}:`, error.message);
+        res.status(500).json({ error: 'Error fetching block data' });
+    }
+});
+
+router.get('/transaction/:hash', async (req, res) => {
+    const { hash } = req.params;
+    try {
+        const response = await axios.get(`${API_URL}/rawtx/${hash}`);
+        res.render('transaction', { transaction: response.data });
+    } catch (error) {
+        console.error(`Error fetching transaction ${hash}:`, error.message);
+        res.status(500).json({ error: 'Error fetching transaction data' });
+    }
+});
+
+router.get('/address/:address', async (req, res) => {
+    const { address } = req.params;
+    try {
+        const response = await axios.get(`${API_URL}/rawaddr/${address}`);
+        res.render('address', { address: response.data });
+    } catch (error) {
+        console.error(`Error fetching address ${address}:`, error.message);
+        res.status(500).json({ error: 'Error fetching address data' });
+    }
+});
+
+module.exports = router;
